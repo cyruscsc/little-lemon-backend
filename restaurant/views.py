@@ -34,21 +34,26 @@ class MenuItemView(generics.RetrieveUpdateDestroyAPIView):
     else:
       return []
 
-class BookingView(generics.ListCreateAPIView):
+class BookingsView(generics.ListCreateAPIView):
   queryset = Booking.objects.all()
   serializer_class = BookingSerializer
   permission_classes = [IsAuthenticated]
 
   def post(self, request, *args, **kwargs):
-    name = request.data['name']
-    no_of_guests = request.data['no_of_guests']
+    user = request.user
+    num_guests = request.data['num_guests']
     date = request.data['date']
     time = request.data['time']
     try:
       date_split = [int(string) for string in date.split('-')]
       time_split = [int(string) for string in time.split(':')]
       date_time = datetime(date_split[0], date_split[1], date_split[2], time_split[0], time_split[1])
-      Booking.objects.create(name=name, no_of_guests=no_of_guests, booking_date=date_time)
+      Booking.objects.create(user=user, num_guests=num_guests, booking_date=date_time)
     except:
       return JsonResponse(status=400, data={'message': 'Booking failed'})
     return JsonResponse(status=201, data={'message': 'Booking successful'})
+
+class SingleBookingView(generics.RetrieveDestroyAPIView):
+  queryset = Booking.objects.all()
+  serializer_class = BookingSerializer
+  permission_class = [IsAuthenticated]
