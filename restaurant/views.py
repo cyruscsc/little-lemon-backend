@@ -9,12 +9,11 @@ from .serializers import MenuSerializer, BookingSerializer
 from .permissions import IsManager
 
 # Create your views here.
-class IndexView(TemplateView):
-  template_name = 'index.html'
-
 class MenuView(generics.ListCreateAPIView):
   queryset = Menu.objects.all()
   serializer_class = MenuSerializer
+  search_fields = ['title','category__title']
+  ordering_fields = ['price']
 
   def get_permissions(self):
     if self.request.method != 'GET':
@@ -39,16 +38,21 @@ class BookingsView(generics.ListCreateAPIView):
   serializer_class = BookingSerializer
   permission_classes = [IsAuthenticated]
 
+  def get_queryset(self):
+    if self.request.user.groups.filter(name='Manager').exists():
+      queryset = Booking.objects.all()
+    else:
+      queryset = Booking.objects.filter(user=self.request.user)
+    return queryset
+
   def post(self, request, *args, **kwargs):
-    user = request.user
-    num_guests = request.data['num_guests']
-    date = request.data['date']
-    time = request.data['time']
     try:
-      date_split = [int(string) for string in date.split('-')]
-      time_split = [int(string) for string in time.split(':')]
-      date_time = datetime(date_split[0], date_split[1], date_split[2], time_split[0], time_split[1])
-      Booking.objects.create(user=user, num_guests=num_guests, booking_date=date_time)
+      Booking.objects.create(
+        user=request.user,
+        num_guests=request.data['num_guests'],
+        date=request.data['date'],
+        time=request.data['time']
+        )
     except:
       return JsonResponse(status=400, data={'message': 'Booking failed'})
     return JsonResponse(status=201, data={'message': 'Booking successful'})
@@ -57,3 +61,10 @@ class SingleBookingView(generics.RetrieveDestroyAPIView):
   queryset = Booking.objects.all()
   serializer_class = BookingSerializer
   permission_class = [IsAuthenticated]
+
+  def get_queryset(self):
+    if self.request.user.groups.filter(name='Manager').exists():
+      queryset = Booking.objects.all()
+    else:
+      queryset = Booking.objects.filter(user=self.request.user)
+    return queryset

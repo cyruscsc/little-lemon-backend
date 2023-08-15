@@ -21,7 +21,8 @@ class Menu(models.Model):
 class Booking(models.Model):
   user = models.ForeignKey(User, on_delete=models.CASCADE)
   num_guests = models.IntegerField()
-  booking_date = models.DateTimeField()
+  date = models.DateField()
+  time = models.TimeField()
 
   def __str__(self) -> str:
-    return f"{self.name} - {self.no_of_guests} guests"
+    return f"{self.user} - {self.num_guests} guests"
