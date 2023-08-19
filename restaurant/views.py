@@ -1,14 +1,67 @@
 from django.shortcuts import render
 from django.views.generic import TemplateView
 from django.http import JsonResponse
+from django.middleware.csrf import get_token
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.hashers import make_password
+from django.views.decorators.http import require_POST
 from rest_framework import generics
+from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from datetime import datetime
 from .models import Menu, Booking
-from .serializers import MenuSerializer, BookingSerializer
+from .serializers import UserSerializer, MenuSerializer, BookingSerializer
 from .permissions import IsManager
 
 # Create your views here.
+def csrfView(request):
+  return JsonResponse(status=200, data={'csrf_token': get_token(request)})
+
+class RegisterView(APIView):
+  def post(self, request, *args, **kwargs):
+    user_data = {
+      'username': request.data['username'],
+      'email': request.data['email'],
+      'password': make_password(request.data['password'])
+    }
+    serializer = UserSerializer(user_data)
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
+    return JsonResponse(status=200, data={'message': f'User {serializer.validated_data["username"]} created successfully'})
+
+@require_POST
+def loginView(request):
+  username = request.POST['username']
+  password = request.POST['password']
+  user = authenticate(request, username=username, password=password)
+  if user is not None:
+    login(request, user)
+    return JsonResponse(status=200, data={'message': 'Logged in successfully'})
+  else:
+    return JsonResponse(status=400, data={'message': 'Invalid username or password'})
+
+def logoutView(request):
+  if request.user.is_authenticated:
+    logout(request)
+    return JsonResponse(status=200, data={'message': 'Logged out successfully'})
+  else:
+    return JsonResponse(status=400, data={'message': "It's hard to log out before log in"})
+
+class SessionView(APIView):
+  permission_classes = [IsAuthenticated]
+
+  def get(self, request, *args, **kwargs):
+    return JsonResponse(status=200, data={'session_exists': True})
+
+class UserView(APIView):
+  permission_classes = [IsAuthenticated]
+
+  def get(self, request, *args, **kwargs):
+    return JsonResponse(status=200, data={
+      'username': request.user.username,
+      'email': request.user.email
+    })
+
 class MenuView(generics.ListCreateAPIView):
   queryset = Menu.objects.all()
   serializer_class = MenuSerializer
