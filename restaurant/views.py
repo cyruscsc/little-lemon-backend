@@ -22,17 +22,17 @@ class CheckUsernameView(APIView):
   def post(self, request, *args, **kwargs):
     username = request.data['username']
     if User.objects.filter(username=username).exists():
-      return JsonResponse(data={'valid': False, 'message': 'Username already in use'})
+      return JsonResponse(data={'available': False, 'message': 'Username already in use'})
     else:
-      return JsonResponse(data={'valid': True, 'message': ''})
+      return JsonResponse(data={'available': True, 'message': ''})
 
 class CheckEmailView(APIView):
   def post(self, request, *args, **kwargs):
     email = request.data['email']
     if User.objects.filter(email=email).exists():
-      return JsonResponse(data={'valid': False, 'message': 'Email already in use'})
+      return JsonResponse(data={'available': False, 'message': 'Email already in use'})
     else:
-      return JsonResponse(data={'valid': True, 'message': ''})
+      return JsonResponse(data={'available': True, 'message': ''})
 
 class RegisterView(APIView):
   def post(self, request, *args, **kwargs):
