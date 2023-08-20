@@ -1,9 +1,10 @@
 from django.urls import path
-from rest_framework.authtoken.views import obtain_auth_token
 from . import views
 
 urlpatterns = [
   path('csrf', views.csrfView),
+  path('checkusername', views.CheckUsernameView.as_view()),
+  path('checkemail', views.CheckEmailView.as_view()),
   path('register', views.RegisterView.as_view()),
   path('login', views.loginView),
   path('logout', views.logoutView),

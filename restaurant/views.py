@@ -4,6 +4,7 @@ from django.http import JsonResponse
 from django.middleware.csrf import get_token
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.hashers import make_password
+from django.contrib.auth.models import User
 from django.views.decorators.http import require_POST
 from rest_framework import generics
 from rest_framework.views import APIView
@@ -16,6 +17,22 @@ from .permissions import IsManager
 # Create your views here.
 def csrfView(request):
   return JsonResponse(status=200, data={'csrf_token': get_token(request)})
+
+class CheckUsernameView(APIView):
+  def post(self, request, *args, **kwargs):
+    username = request.data['username']
+    if User.objects.filter(username=username).exists():
+      return JsonResponse(data={'valid': False, 'message': 'Username already in use'})
+    else:
+      return JsonResponse(data={'valid': True, 'message': ''})
+
+class CheckEmailView(APIView):
+  def post(self, request, *args, **kwargs):
+    email = request.data['email']
+    if User.objects.filter(email=email).exists():
+      return JsonResponse(data={'valid': False, 'message': 'Email already in use'})
+    else:
+      return JsonResponse(data={'valid': True, 'message': ''})
 
 class RegisterView(APIView):
   def post(self, request, *args, **kwargs):
