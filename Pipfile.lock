@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "5537f03c8e7169015de543dda8dfb2982a6bdb53aa1501e5ae828754eb0b037c"
+            "sha256": "62735b099ad2e372d69cc0a9922074edf20e98d97bb96e863f7746dbda86f4d6"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -31,6 +31,14 @@
             ],
             "index": "pypi",
             "version": "==4.2.4"
+        },
+        "django-cors-headers": {
+            "hashes": [
+                "sha256:9ada212b0e2efd4a5e339360ffc869cb21ac5605e810afe69f7308e577ea5bde",
+                "sha256:f9749c6410fe738278bc2b6ef17f05195bc7b251693c035752d8257026af024f"
+            ],
+            "index": "pypi",
+            "version": "==4.2.0"
         },
         "djangorestframework": {
             "hashes": [

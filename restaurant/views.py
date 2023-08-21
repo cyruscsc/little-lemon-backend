@@ -16,7 +16,9 @@ from .permissions import IsManager
 
 # Create your views here.
 def csrfView(request):
-  return JsonResponse(status=200, data={'csrf_token': get_token(request)})
+  token = get_token(request)
+  print(token)
+  return JsonResponse(status=200, data={'csrf_token': token})
 
 class CheckUsernameView(APIView):
   def post(self, request, *args, **kwargs):
@@ -41,7 +43,7 @@ class RegisterView(APIView):
       'email': request.data['email'],
       'password': make_password(request.data['password'])
     }
-    serializer = UserSerializer(user_data)
+    serializer = UserSerializer(data=user_data)
     serializer.is_valid(raise_exception=True)
     serializer.save()
     return JsonResponse(status=200, data={'message': f'User {serializer.validated_data["username"]} created successfully'})
