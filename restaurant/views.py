@@ -17,7 +17,6 @@ from .permissions import IsManager
 # Create your views here.
 def csrfView(request):
   token = get_token(request)
-  print(token)
   return JsonResponse(status=200, data={'csrf_token': token})
 
 class CheckUsernameView(APIView):
@@ -48,16 +47,16 @@ class RegisterView(APIView):
     serializer.save()
     return JsonResponse(status=200, data={'message': f'User {serializer.validated_data["username"]} created successfully'})
 
-@require_POST
-def loginView(request):
-  username = request.POST['username']
-  password = request.POST['password']
-  user = authenticate(request, username=username, password=password)
-  if user is not None:
-    login(request, user)
-    return JsonResponse(status=200, data={'message': 'Logged in successfully'})
-  else:
-    return JsonResponse(status=400, data={'message': 'Invalid username or password'})
+class LoginView(APIView):
+  def post(self, request, *args, **kwargs):
+    username = request.data['username']
+    password = request.data['password']
+    user = authenticate(request, username=username, password=password)
+    if user is not None:
+      login(request, user)
+      return JsonResponse(status=200, data={'message': 'Logged in successfully'})
+    else:
+      return JsonResponse(status=400, data={'message': 'Invalid username or password'})
 
 def logoutView(request):
   if request.user.is_authenticated:
