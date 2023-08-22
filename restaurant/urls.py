@@ -1,11 +1,13 @@
 from django.urls import path
-from rest_framework.authtoken.views import obtain_auth_token
 from . import views
 
 urlpatterns = [
-  path('api/menu', views.MenuView.as_view()),
-  path('api/menu/<int:pk>', views.MenuItemView.as_view()),
-  path('api/bookings', views.BookingsView.as_view()),
-  path('api/bookings/<int:pk>', views.SingleBookingView.as_view()),
-  path('api-token-auth', obtain_auth_token),
+  path('register', views.RegisterView.as_view()),
+  path('login', views.LoginView.as_view()),
+  path('logout', views.LogoutView.as_view()),
+  path('user', views.UserView.as_view()),
+  path('menu', views.MenuView.as_view()),
+  path('menu/<int:pk>', views.MenuItemView.as_view()),
+  path('bookings', views.BookingsView.as_view()),
+  path('bookings/<int:pk>', views.SingleBookingView.as_view()),
 ]
