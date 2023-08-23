@@ -20,6 +20,7 @@ class Menu(models.Model):
 
 class Booking(models.Model):
   user = models.ForeignKey(User, on_delete=models.CASCADE)
+  email = models.EmailField()
   num_guests = models.IntegerField()
   date = models.DateField()
   time = models.TimeField()
