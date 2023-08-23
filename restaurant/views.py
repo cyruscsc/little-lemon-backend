@@ -13,6 +13,7 @@ from datetime import datetime
 from .models import Menu, Booking
 from .serializers import UserSerializer, MenuSerializer, BookingSerializer
 from .permissions import IsManager
+from .jwtauth import JwtToken, ACCESS_TOKEN_COOKIE_KEY, REFRESH_TOKEN_COOKIE_KEY
 import jwt, datetime
 
 jwt_secret = 'This is not a secret'
@@ -38,39 +39,45 @@ class LoginView(APIView):
       user = authenticate(username=username, password=password)
     except:
       raise AuthenticationFailed('Incorrect username or password')
-    access_payload = {
-      'user_id': user.id,
-      'username': user.username,
-      'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=5),
-      'iat': datetime.datetime.utcnow(),
-    }
-    access_token = jwt.encode(access_payload, jwt_secret, algorithm='HS256')
+
+    jwt_token = JwtToken(request)
+    jwt_token.issue(user.id, user.username)
+
     response = Response()
-    response.set_cookie(key='jwtaccess', value=access_token, httponly=True)
+    response.set_cookie(key=ACCESS_TOKEN_COOKIE_KEY, value=jwt_token.access_token, httponly=True)
+    response.set_cookie(key=REFRESH_TOKEN_COOKIE_KEY, value=jwt_token.refresh_token, httponly=True)
     response.data = {
-      'jwtaccess': access_token
+      ACCESS_TOKEN_COOKIE_KEY: jwt_token.access_token,
+      REFRESH_TOKEN_COOKIE_KEY: jwt_token.refresh_token,
     }
     return response
 
 class LogoutView(APIView):
   def post(self, request, *args, **kwargs):
     response = Response()
-    response.delete_cookie('jwtaccess')
-    response.data ={
-      'message': 'Logged out successfully'
+    response.delete_cookie(ACCESS_TOKEN_COOKIE_KEY)
+    response.delete_cookie(REFRESH_TOKEN_COOKIE_KEY)
+    response.data = {
+      'message': 'Logged out successfully',
     }
     return response
 
 class UserView(APIView):
   def get(self, request, *args, **kwargs):
-    access_token = request.COOKIES.get('jwtaccess')
-    try:
-      access_payload = jwt.decode(access_token, jwt_secret, algorithms=['HS256'])
-    except:
+    jwt_token = JwtToken(request)
+    if jwt_token.is_valid():
+      user_id, username = jwt_token.get_user()
+    else:
       raise AuthenticationFailed('Unauthenticated user')
-    user = User.objects.filter(id=access_payload['user_id']).first()
-    serializer = UserSerializer(user)
-    return Response(serializer.data)
+
+    response = Response()
+    response.data = {
+      'user_id': user_id,
+      'username': username,
+    }
+    response.set_cookie(key=ACCESS_TOKEN_COOKIE_KEY, value=jwt_token.access_token, httponly=True)
+    response.set_cookie(key=REFRESH_TOKEN_COOKIE_KEY, value=jwt_token.refresh_token, httponly=True)
+    return response
 
 class MenuView(generics.ListCreateAPIView):
   queryset = Menu.objects.all()
