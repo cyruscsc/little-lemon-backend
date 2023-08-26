@@ -11,6 +11,7 @@ class Category(models.Model):
 
 class Menu(models.Model):
   title = models.CharField(db_index=True, max_length=255)
+  description = models.TextField(max_length=2000)
   price = models.DecimalField(db_index=True, max_digits=5, decimal_places=2)
   featured = models.BooleanField(db_index=True)
   category = models.ForeignKey(Category, on_delete=models.PROTECT)
