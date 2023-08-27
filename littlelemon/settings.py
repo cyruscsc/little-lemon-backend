@@ -23,9 +23,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-8(79$a=!-4xvi!$04=oq!)x11=1y7b3xc($y_qup=31eg6*nl8'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'littlelemon.cyruscsc.com',
+    'localhost',
+    '127.0.0.1',
+]
 
 
 # Application definition
@@ -141,6 +145,18 @@ REST_FRAMEWORK = {
     ],
 }
 
-# CORS settings
-CORS_ORIGIN_ALLOW_ALL = True
+
+# CORS & CSRF settings
+# CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_ORIGINS = [
+    'http://littlelemon.cyruscsc.com',
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    'http://littlelemon.cyruscsc.com',
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+]
