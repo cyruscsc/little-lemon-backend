@@ -1,4 +1,4 @@
-# Little Lemon Backend Documentation
+# Little Lemon Back-End Documentation
 
 Front-end repo: https://github.com/cyruscsc/little-lemon-frontend
 
@@ -10,6 +10,14 @@ Front-end repo: https://github.com/cyruscsc/little-lemon-frontend
 - `whitenoise`
 - `mysqlclient`
 - `pyjwt`
+
+## Database Structure
+
+The project utilizes the MySQL database. Besides the Django default `User` model, 3 other models, namely `Category`, `Menu`, and `Booking` are created to store and manage data.
+
+### Entity Relationship Diagram
+
+![Little Lemon Back-End ERD](/images/little-lemon-erd-bg.png)
 
 ## User Authentication
 
